@@ -16,6 +16,7 @@ class ExamProvider extends ChangeNotifier {
   // Questions
   List<Map<String, dynamic>> _questions = [];
   int _currentQuestionIndex = 0;
+  // Answers: for MCQ stores option id, for essay stores text
   Map<int, String> _answers = {};
   Set<int> _flaggedQuestions = {};
 
@@ -41,9 +42,17 @@ class ExamProvider extends ChangeNotifier {
   int get remainingSeconds => _remainingSeconds;
   int get answeredCount => _answers.length;
   List<Map<String, dynamic>> get incidents => _incidents;
+  bool get isOnLastQuestion => _currentQuestionIndex == _questions.length - 1;
+  bool get isOnFirstQuestion => _currentQuestionIndex == 0;
 
   Map<String, dynamic>? get currentQuestion =>
       _questions.isNotEmpty ? _questions[_currentQuestionIndex] : null;
+
+  bool get isCurrentQuestionEssay {
+    final q = currentQuestion;
+    if (q == null) return false;
+    return q['type'] == 'essay';
+  }
 
   String get formattedTime {
     final hours = _remainingSeconds ~/ 3600;
@@ -54,8 +63,8 @@ class ExamProvider extends ChangeNotifier {
         '${seconds.toString().padLeft(2, '0')}';
   }
 
-  bool get isTimeCritical => _remainingSeconds < 300; // < 5 minutes
-  bool get isTimeWarning => _remainingSeconds < 600; // < 10 minutes
+  bool get isTimeCritical => _remainingSeconds < 300;
+  bool get isTimeWarning => _remainingSeconds < 600;
 
   Future<void> loadExam(String token) async {
     _isLoading = true;
@@ -132,6 +141,15 @@ class ExamProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setEssayAnswer(String text) {
+    if (text.trim().isEmpty) {
+      _answers.remove(_currentQuestionIndex);
+    } else {
+      _answers[_currentQuestionIndex] = text;
+    }
+    notifyListeners();
+  }
+
   void toggleFlag() {
     if (_flaggedQuestions.contains(_currentQuestionIndex)) {
       _flaggedQuestions.remove(_currentQuestionIndex);
@@ -158,9 +176,11 @@ class ExamProvider extends ChangeNotifier {
 
       final answersList = _answers.entries.map((entry) {
         final question = _questions[entry.key];
+        final isEssay = question['type'] == 'essay';
         return {
           'questionId': question['id'],
-          'selectedOption': entry.value,
+          if (isEssay) 'essayAnswer': entry.value,
+          if (!isEssay) 'selectedOption': entry.value,
         };
       }).toList();
 

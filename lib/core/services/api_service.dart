@@ -39,7 +39,7 @@ class ApiService {
     return {
       'title': 'General Assessment',
       'duration_minutes': 45,
-      'total_questions': 40,
+      'total_questions': 45,
     };
   }
 
@@ -123,4 +123,9 @@ final List<Map<String, dynamic>> _mockQuestions = [
   {"id": "q_038", "text": "Your manager asks you to implement a change you believe will hurt the project. What do you do?", "options": [{"id": "q_038_a", "text": "Implement it without question"}, {"id": "q_038_b", "text": "Refuse to do it"}, {"id": "q_038_c", "text": "Present your concerns with evidence, then follow the final decision"}, {"id": "q_038_d", "text": "Implement it poorly so it fails"}], "subject": "Situational Judgement"},
   {"id": "q_039", "text": "During a team presentation, you realize you made an error in your slides. What is the best action?", "options": [{"id": "q_039_a", "text": "Continue and hope no one notices"}, {"id": "q_039_b", "text": "Stop the presentation to fix the slides"}, {"id": "q_039_c", "text": "Acknowledge the error briefly, correct verbally, and continue"}, {"id": "q_039_d", "text": "Blame it on technical difficulties"}], "subject": "Situational Judgement"},
   {"id": "q_040", "text": "You receive feedback that your team's service has been declining. You believe it's unfair. How do you respond?", "options": [{"id": "q_040_a", "text": "Argue with the client and defend performance"}, {"id": "q_040_b", "text": "Thank them, investigate concerns, and develop an action plan"}, {"id": "q_040_c", "text": "Ignore the feedback"}, {"id": "q_040_d", "text": "Forward the complaint to pressure your team"}], "subject": "Situational Judgement"},
+  {"id": "q_041", "text": "Describe a situation where you had to work under pressure to meet a tight deadline. What steps did you take and what was the outcome?", "type": "essay", "subject": "Essay - Professional Experience"},
+  {"id": "q_042", "text": "In your opinion, what are the three most important qualities of an effective leader? Explain each quality with a real-world example.", "type": "essay", "subject": "Essay - Leadership"},
+  {"id": "q_043", "text": "Discuss the impact of artificial intelligence on the modern workplace. What opportunities and challenges does it present for professionals?", "type": "essay", "subject": "Essay - Critical Thinking"},
+  {"id": "q_044", "text": "A company is experiencing declining employee morale. As a newly appointed HR manager, outline a comprehensive plan to address this issue.", "type": "essay", "subject": "Essay - Problem Solving"},
+  {"id": "q_045", "text": "Explain the importance of ethical decision-making in business. Provide an example of an ethical dilemma and how it should be resolved.", "type": "essay", "subject": "Essay - Ethics"},
 ];

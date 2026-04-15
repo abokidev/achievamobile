@@ -289,7 +289,7 @@ class _FacialVerificationScreenState extends State<FacialVerificationScreen>
                   ? AchievaButton(
                       label: AppStrings.proceedToExam,
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/exam');
+                        Navigator.pushReplacementNamed(context, '/exam-details');
                       },
                     )
                   : _verificationFailed

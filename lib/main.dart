@@ -8,6 +8,8 @@ import 'features/auth/screens/login_screen.dart';
 import 'features/exam/providers/exam_provider.dart';
 import 'features/exam/screens/exam_screen.dart';
 import 'features/exam/screens/submission_screen.dart';
+import 'features/exam_setup/screens/exam_details_screen.dart';
+import 'features/exam_setup/screens/test_setup_screen.dart';
 import 'features/onboarding/providers/onboarding_provider.dart';
 import 'features/onboarding/screens/facial_verification_screen.dart';
 import 'features/onboarding/screens/nin_verification_screen.dart';
@@ -49,6 +51,14 @@ class AchievaApp extends StatelessWidget {
             case '/face-verification':
               return MaterialPageRoute(
                 builder: (_) => const FacialVerificationScreen(),
+              );
+            case '/exam-details':
+              return MaterialPageRoute(
+                builder: (_) => const ExamDetailsScreen(),
+              );
+            case '/test-setup':
+              return MaterialPageRoute(
+                builder: (_) => const TestSetupScreen(),
               );
             case '/exam':
               return MaterialPageRoute(
