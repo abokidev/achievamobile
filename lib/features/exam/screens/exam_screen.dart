@@ -264,10 +264,10 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                   leading: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.accent.withOpacity(0.15),
+                      color: AppColors.textSecondary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.refresh_rounded, color: AppColors.accent),
+                    child: const Icon(Icons.refresh_rounded, color: AppColors.textSecondary),
                   ),
                   title: const Text('Reload Page', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
                   subtitle: const Text('Refresh current question', style: TextStyle(color: AppColors.textMuted)),
@@ -404,6 +404,17 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                     ),
                   ],
                 ),
+                // FAB positioned above the bottom bar
+                Positioned(
+                  right: 16,
+                  bottom: 80 + MediaQuery.of(context).padding.bottom,
+                  child: FloatingActionButton(
+                    onPressed: _showFabMenu,
+                    backgroundColor: AppColors.primary,
+                    elevation: 6,
+                    child: const Icon(Icons.dashboard_customize_rounded, color: AppColors.textPrimary),
+                  ),
+                ),
                 // Left exam warning overlay
                 if (_showLeftWarning)
                   Positioned.fill(
@@ -432,12 +443,6 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                     ),
                   ),
               ],
-            ),
-            // FAB with menu (submit + reload)
-            floatingActionButton: FloatingActionButton(
-              onPressed: _showFabMenu,
-              backgroundColor: AppColors.primary,
-              child: const Icon(Icons.more_vert_rounded, color: AppColors.textPrimary),
             ),
           ),
         );
