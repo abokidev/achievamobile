@@ -1,0 +1,33 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+*.iml
+
+# Android
+android/.gradle/
+android/local.properties
+android/app/debug/
+android/app/profile/
+android/app/release/
+**/GeneratedPluginRegistrant.*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node
+backend/node_modules/
+backend/package-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+pubspec.lock
