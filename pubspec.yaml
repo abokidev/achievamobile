@@ -1,0 +1,29 @@
+name: achievamobile
+description: "Achieva - Your Excellence, Verified. Mobile examination platform."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  provider: ^6.1.2
+  http: ^1.2.0
+  flutter_secure_storage: ^9.0.0
+  camera: ^0.10.6
+  google_mlkit_face_detection: ^0.11.0
+  screen_protector: ^1.4.2
+  intl: ^0.19.0
+  shared_preferences: ^2.2.3
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

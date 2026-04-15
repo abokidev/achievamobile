@@ -1,0 +1,18 @@
+[
+  {
+    "id": "usr_001",
+    "name": "John Doe",
+    "email": "test@achieva.ng",
+    "nin": "12345678901",
+    "dob": "1995-05-20",
+    "isVerified": false
+  },
+  {
+    "id": "usr_002",
+    "name": "Jane Smith",
+    "email": "jane@achieva.ng",
+    "nin": "98765432101",
+    "dob": "1993-08-15",
+    "isVerified": false
+  }
+]
