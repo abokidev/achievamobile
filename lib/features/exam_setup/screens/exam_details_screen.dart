@@ -229,8 +229,10 @@ class _ExamDetailsScreenState extends State<ExamDetailsScreen> {
                       label: 'Proceed to Test Setup',
                       backgroundColor: AppColors.primary,
                       onPressed: () {
+                        final examProvider = context.read<ExamProvider>();
+                        examProvider.setAvailableAssessments(_assessments);
                         if (_selectedAssessment != null) {
-                          context.read<ExamProvider>().selectAssessment(
+                          examProvider.selectAssessment(
                             _selectedAssessment!['id'] as String,
                           );
                         }

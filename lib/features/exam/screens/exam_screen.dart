@@ -277,6 +277,26 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                     exam.goToQuestion(exam.currentQuestionIndex);
                   },
                 ),
+                const SizedBox(height: 8),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.assignment_rounded, color: AppColors.accent),
+                  ),
+                  title: const Text('All Assessments', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+                  subtitle: Text(
+                    '${context.read<ExamProvider>().submittedCount} of ${context.read<ExamProvider>().availableAssessments.length} submitted',
+                    style: const TextStyle(color: AppColors.textMuted),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, '/assessment-hub');
+                  },
+                ),
                 const SizedBox(height: 12),
               ],
             ),
@@ -296,11 +316,34 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     if (!mounted) return;
 
     if (result != null) {
-      Navigator.pushReplacementNamed(context, '/submission', arguments: result);
+      Navigator.pushReplacementNamed(context, '/assessment-hub');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to submit exam. Please try again.'), backgroundColor: AppColors.error),
       );
+    }
+  }
+
+  void _onAssessmentChanged(String? assessmentId) async {
+    if (assessmentId == null) return;
+    final exam = context.read<ExamProvider>();
+    if (assessmentId == exam.selectedAssessmentId) return;
+
+    final state = exam.getAssessmentState(assessmentId);
+    if (state != null && state.isSubmitted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This assessment has already been submitted.'),
+          backgroundColor: AppColors.surface2,
+        ),
+      );
+      return;
+    }
+
+    exam.switchToAssessment(assessmentId);
+    final token = context.read<AuthProvider>().token;
+    if (token != null) {
+      await exam.loadExam(token);
     }
   }
 
@@ -321,7 +364,45 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
           child: Scaffold(
             appBar: AppBar(
               automaticallyImplyLeading: false,
-              title: Text(exam.examTitle, style: const TextStyle(fontSize: 16)),
+              title: exam.availableAssessments.length > 1
+                  ? DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: exam.selectedAssessmentId,
+                        isExpanded: true,
+                        dropdownColor: AppColors.surface,
+                        icon: const Icon(Icons.keyboard_arrow_down_rounded,
+                            color: AppColors.textPrimary, size: 20),
+                        style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600),
+                        items: exam.availableAssessments.map((a) {
+                          final id = a['id'] as String;
+                          final title = a['title'] as String;
+                          final state = exam.getAssessmentState(id);
+                          final isSubmitted = state?.isSubmitted ?? false;
+                          return DropdownMenuItem<String>(
+                            value: id,
+                            child: Row(
+                              children: [
+                                Flexible(
+                                  child: Text(title,
+                                      overflow: TextOverflow.ellipsis),
+                                ),
+                                if (isSubmitted) ...[
+                                  const SizedBox(width: 6),
+                                  const Icon(Icons.check_circle,
+                                      color: AppColors.success, size: 14),
+                                ],
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: _onAssessmentChanged,
+                      ),
+                    )
+                  : Text(exam.examTitle,
+                      style: const TextStyle(fontSize: 16)),
               leading: const Padding(
                 padding: EdgeInsets.only(left: 8),
                 child: Center(child: TimerWidget()),
@@ -349,7 +430,6 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                         child: const QuestionCard(),
                       ),
                     ),
-                    // Bottom navigation bar
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: const BoxDecoration(
@@ -360,7 +440,6 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                         top: false,
                         child: Row(
                           children: [
-                            // Previous
                             TextButton.icon(
                               onPressed: exam.isOnFirstQuestion ? null : () => exam.previousQuestion(),
                               icon: const Icon(Icons.chevron_left, size: 20),
@@ -371,14 +450,12 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                               ),
                             ),
                             const Spacer(),
-                            // Question grid
                             IconButton(
                               onPressed: _showQuestionGrid,
                               icon: const Icon(Icons.grid_view_rounded, color: AppColors.textSecondary),
                               tooltip: AppStrings.questionGrid,
                             ),
                             const Spacer(),
-                            // Next or Submit (on last question)
                             if (exam.isOnLastQuestion)
                               ElevatedButton.icon(
                                 onPressed: _showSubmitConfirmation,
@@ -404,7 +481,6 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                     ),
                   ],
                 ),
-                // FAB positioned above the bottom bar
                 Positioned(
                   right: 16,
                   bottom: 80 + MediaQuery.of(context).padding.bottom,
@@ -415,7 +491,6 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                     child: const Icon(Icons.dashboard_customize_rounded, color: AppColors.textPrimary),
                   ),
                 ),
-                // Left exam warning overlay
                 if (_showLeftWarning)
                   Positioned.fill(
                     child: GestureDetector(

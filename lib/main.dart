@@ -7,6 +7,7 @@ import 'features/auth/providers/auth_provider.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/exam/providers/exam_provider.dart';
 import 'features/exam/screens/exam_screen.dart';
+import 'features/exam/screens/assessment_hub_screen.dart';
 import 'features/exam/screens/submission_screen.dart';
 import 'features/exam_setup/screens/exam_details_screen.dart';
 import 'features/exam_setup/screens/test_setup_screen.dart';
@@ -59,6 +60,10 @@ class AchievaApp extends StatelessWidget {
             case '/test-setup':
               return MaterialPageRoute(
                 builder: (_) => const TestSetupScreen(),
+              );
+            case '/assessment-hub':
+              return MaterialPageRoute(
+                builder: (_) => const AssessmentHubScreen(),
               );
             case '/exam':
               return MaterialPageRoute(
