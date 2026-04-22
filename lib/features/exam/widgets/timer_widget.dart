@@ -10,11 +10,11 @@ class TimerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ExamProvider>(
       builder: (context, exam, _) {
-        Color timerColor = AppColors.accent;
+        Color timerColor = AppColors.textPrimary;
         if (exam.isTimeCritical) {
           timerColor = AppColors.error;
         } else if (exam.isTimeWarning) {
-          timerColor = AppColors.accent;
+          timerColor = AppColors.warning;
         }
 
         return AnimatedContainer(

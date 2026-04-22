@@ -2,7 +2,7 @@ name: Build Release APK
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'claude/**']
   workflow_dispatch:
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
-        if: github.ref == 'refs/heads/main'
+        if: always()
         with:
           tag_name: build-${{ github.run_number }}
           name: "Achieva APK — Build ${{ github.run_number }}"

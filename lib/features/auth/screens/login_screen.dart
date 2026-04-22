@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
     if (success) {
       if (authProvider.isVerified) {
-        Navigator.pushReplacementNamed(context, '/exam');
+        Navigator.pushReplacementNamed(context, '/exam-details');
       } else {
         Navigator.pushReplacementNamed(context, '/nin-verification');
       }
@@ -137,15 +137,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
                             letterSpacing: 6,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          AppStrings.tagline,
-                          style: GoogleFonts.dmSans(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
-                            letterSpacing: 1.5,
                           ),
                         ),
                         const SizedBox(height: 60),

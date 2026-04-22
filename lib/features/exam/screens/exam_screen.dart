@@ -76,7 +76,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     final examProvider = context.read<ExamProvider>();
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.primaryLight,
+      backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -87,8 +87,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 40,
-                height: 4,
+                width: 40, height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.textMuted,
                   borderRadius: BorderRadius.circular(2),
@@ -97,18 +96,13 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
               const SizedBox(height: 16),
               const Text(
                 AppStrings.questionGrid,
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
-              // Legend
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _legendDot(AppColors.accent, 'Answered'),
+                  _legendDot(AppColors.primary, 'Answered'),
                   const SizedBox(width: 16),
                   _legendDot(AppColors.surface2, 'Unanswered'),
                   const SizedBox(width: 16),
@@ -120,17 +114,13 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                 child: GridView.builder(
                   shrinkWrap: true,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 8,
-                    mainAxisSpacing: 8,
-                    crossAxisSpacing: 8,
+                    crossAxisCount: 8, mainAxisSpacing: 8, crossAxisSpacing: 8,
                   ),
                   itemCount: examProvider.totalQuestions,
                   itemBuilder: (context, index) {
                     final isAnswered = examProvider.answers.containsKey(index);
-                    final isFlagged =
-                        examProvider.flaggedQuestions.contains(index);
-                    final isCurrent =
-                        index == examProvider.currentQuestionIndex;
+                    final isFlagged = examProvider.flaggedQuestions.contains(index);
+                    final isCurrent = index == examProvider.currentQuestionIndex;
 
                     return GestureDetector(
                       onTap: () {
@@ -141,39 +131,28 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              color: isAnswered
-                                  ? AppColors.accent
-                                  : AppColors.surface2,
+                              color: isAnswered ? AppColors.primary : AppColors.surface2,
                               borderRadius: BorderRadius.circular(8),
                               border: isCurrent
-                                  ? Border.all(
-                                      color: AppColors.textPrimary,
-                                      width: 2,
-                                    )
+                                  ? Border.all(color: AppColors.textPrimary, width: 2)
                                   : null,
                             ),
                             alignment: Alignment.center,
                             child: Text(
                               '${index + 1}',
                               style: TextStyle(
-                                color: isAnswered
-                                    ? AppColors.textPrimary
-                                    : AppColors.textSecondary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
+                                color: isAnswered ? AppColors.textPrimary : AppColors.textSecondary,
+                                fontSize: 12, fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
                           if (isFlagged)
                             Positioned(
-                              top: 2,
-                              right: 2,
+                              top: 2, right: 2,
                               child: Container(
-                                width: 8,
-                                height: 8,
+                                width: 8, height: 8,
                                 decoration: const BoxDecoration(
-                                  color: AppColors.warning,
-                                  shape: BoxShape.circle,
+                                  color: AppColors.warning, shape: BoxShape.circle,
                                 ),
                               ),
                             ),
@@ -194,18 +173,11 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     return Row(
       children: [
         Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(3),
-          ),
+          width: 12, height: 12,
+          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3)),
         ),
         const SizedBox(width: 4),
-        Text(
-          label,
-          style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
-        ),
+        Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
       ],
     );
   }
@@ -216,32 +188,19 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: AppColors.primaryLight,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text(
-            AppStrings.submitConfirmTitle,
-            style: TextStyle(color: AppColors.textPrimary),
-          ),
+          backgroundColor: AppColors.surface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text(AppStrings.submitConfirmTitle, style: TextStyle(color: AppColors.textPrimary)),
           content: Text(
             AppStrings.submitConfirmMessage(
-              examProvider.answeredCount,
-              examProvider.totalQuestions,
-              examProvider.formattedTime,
+              examProvider.answeredCount, examProvider.totalQuestions, examProvider.formattedTime,
             ),
-            style: const TextStyle(
-              color: AppColors.textSecondary,
-              height: 1.5,
-            ),
+            style: const TextStyle(color: AppColors.textSecondary, height: 1.5),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(color: AppColors.textMuted),
-              ),
+              child: const Text('Cancel', style: TextStyle(color: AppColors.textMuted)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -249,14 +208,99 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                 _submitExam();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.accent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               ),
               child: const Text(AppStrings.submitExam),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  void _showFabMenu() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40, height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.textMuted, borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.send_rounded, color: AppColors.primary),
+                  ),
+                  title: const Text('Submit Exam', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+                  subtitle: Text(
+                    '${context.read<ExamProvider>().answeredCount} of ${context.read<ExamProvider>().totalQuestions} answered',
+                    style: const TextStyle(color: AppColors.textMuted),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showSubmitConfirmation();
+                  },
+                ),
+                const SizedBox(height: 8),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.textSecondary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.refresh_rounded, color: AppColors.textSecondary),
+                  ),
+                  title: const Text('Reload Page', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+                  subtitle: const Text('Refresh current question', style: TextStyle(color: AppColors.textMuted)),
+                  onTap: () {
+                    Navigator.pop(context);
+                    final exam = context.read<ExamProvider>();
+                    exam.goToQuestion(exam.currentQuestionIndex);
+                  },
+                ),
+                const SizedBox(height: 8),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.assignment_rounded, color: AppColors.accent),
+                  ),
+                  title: const Text('All Assessments', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+                  subtitle: Text(
+                    '${context.read<ExamProvider>().submittedCount} of ${context.read<ExamProvider>().availableAssessments.length} submitted',
+                    style: const TextStyle(color: AppColors.textMuted),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, '/assessment-hub');
+                  },
+                ),
+                const SizedBox(height: 12),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -272,18 +316,34 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     if (!mounted) return;
 
     if (result != null) {
-      Navigator.pushReplacementNamed(
-        context,
-        '/submission',
-        arguments: result,
-      );
+      Navigator.pushReplacementNamed(context, '/assessment-hub');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to submit exam. Please try again.'), backgroundColor: AppColors.error),
+      );
+    }
+  }
+
+  void _onAssessmentChanged(String? assessmentId) async {
+    if (assessmentId == null) return;
+    final exam = context.read<ExamProvider>();
+    if (assessmentId == exam.selectedAssessmentId) return;
+
+    final state = exam.getAssessmentState(assessmentId);
+    if (state != null && state.isSubmitted) {
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Failed to submit exam. Please try again.'),
-          backgroundColor: AppColors.error,
+          content: Text('This assessment has already been submitted.'),
+          backgroundColor: AppColors.surface2,
         ),
       );
+      return;
+    }
+
+    exam.switchToAssessment(assessmentId);
+    final token = context.read<AuthProvider>().token;
+    if (token != null) {
+      await exam.loadExam(token);
     }
   }
 
@@ -304,12 +364,47 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
           child: Scaffold(
             appBar: AppBar(
               automaticallyImplyLeading: false,
-              title: Text(
-                exam.examTitle,
-                style: const TextStyle(fontSize: 16),
-              ),
-              leading: Padding(
-                padding: const EdgeInsets.only(left: 8),
+              title: exam.availableAssessments.length > 1
+                  ? DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: exam.selectedAssessmentId,
+                        isExpanded: true,
+                        dropdownColor: AppColors.surface,
+                        icon: const Icon(Icons.keyboard_arrow_down_rounded,
+                            color: AppColors.textPrimary, size: 20),
+                        style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600),
+                        items: exam.availableAssessments.map((a) {
+                          final id = a['id'] as String;
+                          final title = a['title'] as String;
+                          final state = exam.getAssessmentState(id);
+                          final isSubmitted = state?.isSubmitted ?? false;
+                          return DropdownMenuItem<String>(
+                            value: id,
+                            child: Row(
+                              children: [
+                                Flexible(
+                                  child: Text(title,
+                                      overflow: TextOverflow.ellipsis),
+                                ),
+                                if (isSubmitted) ...[
+                                  const SizedBox(width: 6),
+                                  const Icon(Icons.check_circle,
+                                      color: AppColors.success, size: 14),
+                                ],
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: _onAssessmentChanged,
+                      ),
+                    )
+                  : Text(exam.examTitle,
+                      style: const TextStyle(fontSize: 16)),
+              leading: const Padding(
+                padding: EdgeInsets.only(left: 8),
                 child: Center(child: TimerWidget()),
               ),
               leadingWidth: 140,
@@ -319,10 +414,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                     padding: const EdgeInsets.only(right: 16),
                     child: Text(
                       'Q ${exam.currentQuestionIndex + 1} / ${exam.totalQuestions}',
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
@@ -334,97 +426,89 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                   children: [
                     Expanded(
                       child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
                         child: const QuestionCard(),
                       ),
                     ),
-                    // Bottom navigation
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        border: Border(
-                          top: BorderSide(color: AppColors.border),
-                        ),
+                        color: AppColors.surface,
+                        border: Border(top: BorderSide(color: AppColors.border)),
                       ),
                       child: SafeArea(
                         top: false,
                         child: Row(
                           children: [
-                            // Previous
                             TextButton.icon(
-                              onPressed: exam.currentQuestionIndex > 0
-                                  ? () => exam.previousQuestion()
-                                  : null,
+                              onPressed: exam.isOnFirstQuestion ? null : () => exam.previousQuestion(),
                               icon: const Icon(Icons.chevron_left, size: 20),
                               label: const Text(AppStrings.previousQuestion),
                               style: TextButton.styleFrom(
                                 foregroundColor: AppColors.textSecondary,
-                                disabledForegroundColor:
-                                    AppColors.textMuted.withOpacity(0.4),
+                                disabledForegroundColor: AppColors.textMuted.withOpacity(0.3),
                               ),
                             ),
                             const Spacer(),
-                            // Question grid
                             IconButton(
                               onPressed: _showQuestionGrid,
-                              icon: const Icon(
-                                Icons.grid_view_rounded,
-                                color: AppColors.textSecondary,
-                              ),
+                              icon: const Icon(Icons.grid_view_rounded, color: AppColors.textSecondary),
                               tooltip: AppStrings.questionGrid,
                             ),
                             const Spacer(),
-                            // Next
-                            TextButton.icon(
-                              onPressed: exam.currentQuestionIndex <
-                                      exam.totalQuestions - 1
-                                  ? () => exam.nextQuestion()
-                                  : null,
-                              icon: const Text(AppStrings.nextQuestion),
-                              label: const Icon(Icons.chevron_right, size: 20),
-                              style: TextButton.styleFrom(
-                                foregroundColor: AppColors.textSecondary,
-                                disabledForegroundColor:
-                                    AppColors.textMuted.withOpacity(0.4),
+                            if (exam.isOnLastQuestion)
+                              ElevatedButton.icon(
+                                onPressed: _showSubmitConfirmation,
+                                icon: const Icon(Icons.send_rounded, size: 18),
+                                label: const Text('Submit'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: AppColors.textPrimary,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                ),
+                              )
+                            else
+                              TextButton.icon(
+                                onPressed: () => exam.nextQuestion(),
+                                icon: const Text(AppStrings.nextQuestion),
+                                label: const Icon(Icons.chevron_right, size: 20),
+                                style: TextButton.styleFrom(foregroundColor: AppColors.textSecondary),
                               ),
-                            ),
                           ],
                         ),
                       ),
                     ),
                   ],
                 ),
-                // Left exam warning overlay
+                Positioned(
+                  right: 16,
+                  bottom: 80 + MediaQuery.of(context).padding.bottom,
+                  child: FloatingActionButton(
+                    onPressed: _showFabMenu,
+                    backgroundColor: AppColors.primary,
+                    elevation: 6,
+                    child: const Icon(Icons.dashboard_customize_rounded, color: AppColors.textPrimary),
+                  ),
+                ),
                 if (_showLeftWarning)
                   Positioned.fill(
                     child: GestureDetector(
                       onTap: () => setState(() => _showLeftWarning = false),
                       child: Container(
                         color: Colors.black.withOpacity(0.8),
-                        child: Center(
+                        child: const Center(
                           child: Padding(
-                            padding: const EdgeInsets.all(32),
+                            padding: EdgeInsets.all(32),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
-                                  Icons.warning_amber_rounded,
-                                  color: AppColors.warning,
-                                  size: 60,
-                                ),
-                                const SizedBox(height: 16),
-                                const Text(
+                                Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 60),
+                                SizedBox(height: 16),
+                                Text(
                                   AppStrings.examLeftWarning,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: AppColors.textPrimary,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w600),
                                 ),
                               ],
                             ),
@@ -435,15 +519,6 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                   ),
               ],
             ),
-            // Submit FAB
-            floatingActionButton: exam.answeredCount > 0
-                ? FloatingActionButton.extended(
-                    onPressed: _showSubmitConfirmation,
-                    backgroundColor: AppColors.accent,
-                    icon: const Icon(Icons.send),
-                    label: const Text(AppStrings.submitExam),
-                  )
-                : null,
           ),
         );
       },

@@ -1,9 +1,6 @@
-import 'dart:convert';
-import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:screen_protector/screen_protector.dart';
-import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/strings.dart';
@@ -23,21 +20,11 @@ class _FacialVerificationScreenState extends State<FacialVerificationScreen>
     with SingleTickerProviderStateMixin {
   CameraController? _cameraController;
   late AnimationController _pulseController;
-  final FaceDetector _faceDetector = FaceDetector(
-    options: FaceDetectorOptions(
-      enableClassification: true,
-      enableTracking: true,
-      performanceMode: FaceDetectorMode.accurate,
-    ),
-  );
 
   bool _isCameraInitialized = false;
-  bool _isProcessing = false;
-  bool _livenessConfirmed = false;
   bool _verificationSuccess = false;
   bool _verificationFailed = false;
-  int _blinkCount = 0;
-  bool _wasEyeOpen = true;
+  bool _isVerifying = false;
   String _instruction = AppStrings.faceInstruction;
 
   @override
@@ -60,6 +47,15 @@ class _FacialVerificationScreenState extends State<FacialVerificationScreen>
   Future<void> _initCamera() async {
     try {
       final cameras = await availableCameras();
+      if (cameras.isEmpty) {
+        // No camera available — allow demo bypass
+        if (mounted) {
+          setState(() {
+            _instruction = 'No camera detected. Tap "Verify" to continue in demo mode.';
+          });
+        }
+        return;
+      }
       final frontCamera = cameras.firstWhere(
         (c) => c.lensDirection == CameraLensDirection.front,
         orElse: () => cameras.first,
@@ -71,153 +67,70 @@ class _FacialVerificationScreenState extends State<FacialVerificationScreen>
       );
       await _cameraController!.initialize();
       if (mounted) {
-        setState(() => _isCameraInitialized = true);
-        _startLivenessDetection();
+        setState(() {
+          _isCameraInitialized = true;
+          _instruction = 'Position your face within the oval, then tap "Verify"';
+        });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _instruction = 'Camera not available. Please grant camera permission.';
+          _instruction = 'Camera not available. Tap "Verify" to continue in demo mode.';
         });
       }
     }
   }
 
-  void _startLivenessDetection() {
-    if (_cameraController == null || !_cameraController!.value.isInitialized) return;
-
-    _cameraController!.startImageStream((CameraImage image) async {
-      if (_isProcessing || _livenessConfirmed) return;
-      _isProcessing = true;
-
-      try {
-        final inputImage = _convertCameraImage(image);
-        if (inputImage == null) {
-          _isProcessing = false;
-          return;
-        }
-
-        final faces = await _faceDetector.processImage(inputImage);
-        if (faces.isNotEmpty) {
-          final face = faces.first;
-          final leftEye = face.leftEyeOpenProbability ?? 1.0;
-          final rightEye = face.rightEyeOpenProbability ?? 1.0;
-
-          final eyesOpen = leftEye > 0.5 && rightEye > 0.5;
-          final eyesClosed = leftEye < 0.3 && rightEye < 0.3;
-
-          if (_wasEyeOpen && eyesClosed) {
-            _blinkCount++;
-          }
-          _wasEyeOpen = eyesOpen;
-
-          if (_blinkCount >= 2) {
-            setState(() {
-              _livenessConfirmed = true;
-              _instruction = 'Liveness confirmed. Capturing...';
-            });
-            await _cameraController!.stopImageStream();
-            await _captureAndVerify();
-          } else {
-            if (mounted) {
-              setState(() {
-                _instruction = 'Please blink naturally (${_blinkCount}/2 blinks detected)';
-              });
-            }
-          }
-        }
-      } catch (_) {
-        // Continue processing
-      }
-
-      _isProcessing = false;
+  Future<void> _verifyFace() async {
+    if (_isVerifying) return;
+    setState(() {
+      _isVerifying = true;
+      _instruction = 'Verifying...';
     });
-  }
 
-  InputImage? _convertCameraImage(CameraImage image) {
-    try {
-      final rotation = InputImageRotationValue.fromRawValue(
-        _cameraController!.description.sensorOrientation,
-      );
-      if (rotation == null) return null;
+    final authProvider = context.read<AuthProvider>();
+    final token = authProvider.token;
+    if (token == null) return;
 
-      final format = InputImageFormatValue.fromRawValue(image.format.raw as int);
-      if (format == null) return null;
+    final success = await context.read<OnboardingProvider>().verifyFace(
+          'demo_image_data',
+          '',
+          token,
+        );
 
-      final plane = image.planes.first;
-      return InputImage.fromBytes(
-        bytes: plane.bytes,
-        metadata: InputImageMetadata(
-          size: Size(image.width.toDouble(), image.height.toDouble()),
-          rotation: rotation,
-          format: format,
-          bytesPerRow: plane.bytesPerRow,
-        ),
-      );
-    } catch (_) {
-      return null;
-    }
-  }
+    if (!mounted) return;
 
-  Future<void> _captureAndVerify() async {
-    try {
-      final image = await _cameraController!.takePicture();
-      final bytes = await image.readAsBytes();
-      final base64Image = base64Encode(bytes);
-
-      if (!mounted) return;
-
-      final authProvider = context.read<AuthProvider>();
-      final token = authProvider.token;
-      if (token == null) return;
-
-      final success = await context.read<OnboardingProvider>().verifyFace(
-            base64Image,
-            '',
-            token,
-          );
-
-      if (!mounted) return;
-
-      if (success) {
-        authProvider.setVerified(true);
-        setState(() {
-          _verificationSuccess = true;
-          _instruction = AppStrings.identityConfirmed;
-        });
-      } else {
-        setState(() {
-          _verificationFailed = true;
-          _instruction = AppStrings.faceVerificationFailed;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _verificationFailed = true;
-          _instruction = AppStrings.faceVerificationFailed;
-        });
-      }
+    if (success) {
+      authProvider.setVerified(true);
+      setState(() {
+        _verificationSuccess = true;
+        _isVerifying = false;
+        _instruction = AppStrings.identityConfirmed;
+      });
+    } else {
+      setState(() {
+        _verificationFailed = true;
+        _isVerifying = false;
+        _instruction = AppStrings.faceVerificationFailed;
+      });
     }
   }
 
   void _retry() {
     setState(() {
-      _livenessConfirmed = false;
       _verificationFailed = false;
       _verificationSuccess = false;
-      _blinkCount = 0;
-      _wasEyeOpen = true;
-      _instruction = AppStrings.faceInstruction;
+      _isVerifying = false;
+      _instruction = _isCameraInitialized
+          ? 'Position your face within the oval, then tap "Verify"'
+          : 'Tap "Verify" to continue in demo mode.';
     });
-    _startLivenessDetection();
   }
 
   @override
   void dispose() {
     _cameraController?.dispose();
     _pulseController.dispose();
-    _faceDetector.close();
     super.dispose();
   }
 
@@ -259,7 +172,7 @@ class _FacialVerificationScreenState extends State<FacialVerificationScreen>
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Camera preview
+                      // Camera preview or placeholder
                       if (_isCameraInitialized && _cameraController != null)
                         ClipOval(
                           child: SizedBox(
@@ -284,9 +197,11 @@ class _FacialVerificationScreenState extends State<FacialVerificationScreen>
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.circular(130),
                           ),
-                          child: const Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.accent,
+                          child: Center(
+                            child: Icon(
+                              Icons.person,
+                              size: 100,
+                              color: AppColors.textMuted.withOpacity(0.5),
                             ),
                           ),
                         ),
@@ -357,7 +272,7 @@ class _FacialVerificationScreenState extends State<FacialVerificationScreen>
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
-                  context.read<OnboardingProvider>().verifiedName ?? '',
+                  context.read<OnboardingProvider>().verifiedName ?? 'Demo Candidate',
                   style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 20,
@@ -374,7 +289,7 @@ class _FacialVerificationScreenState extends State<FacialVerificationScreen>
                   ? AchievaButton(
                       label: AppStrings.proceedToExam,
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/exam');
+                        Navigator.pushReplacementNamed(context, '/exam-details');
                       },
                     )
                   : _verificationFailed
@@ -382,7 +297,11 @@ class _FacialVerificationScreenState extends State<FacialVerificationScreen>
                           label: AppStrings.retryVerification,
                           onPressed: _retry,
                         )
-                      : const SizedBox.shrink(),
+                      : AchievaButton(
+                          label: 'Verify',
+                          isLoading: _isVerifying,
+                          onPressed: _verifyFace,
+                        ),
             ),
           ],
         ),

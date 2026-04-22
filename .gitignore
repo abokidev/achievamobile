@@ -3,7 +3,12 @@
 .flutter-plugins
 .flutter-plugins-dependencies
 .packages
+# Keep build/app/outputs for APK distribution
 build/
+!build/app/
+!build/app/outputs/
+!build/app/outputs/flutter-apk/
+!build/app/outputs/flutter-apk/app-release.apk
 *.iml
 
 # Android
