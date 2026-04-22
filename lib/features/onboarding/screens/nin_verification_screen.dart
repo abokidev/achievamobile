@@ -93,7 +93,7 @@ class _NinVerificationScreenState extends State<NinVerificationScreen> {
     if (!mounted) return;
 
     if (success) {
-      Navigator.pushReplacementNamed(context, '/face-verification');
+      Navigator.pushNamed(context, '/face-verification');
     } else {
       final error = context.read<OnboardingProvider>().error;
       ScaffoldMessenger.of(context).showSnackBar(

@@ -100,10 +100,12 @@ class _AssessmentHubScreenState extends State<AssessmentHubScreen> {
       builder: (context, exam, _) {
         final allSubmitted = exam.allAssessmentsSubmitted;
 
-        return Scaffold(
+        return PopScope(
+          canPop: Navigator.of(context).canPop(),
+          child: Scaffold(
           appBar: AppBar(
             title: const Text('Assessments'),
-            automaticallyImplyLeading: false,
+            automaticallyImplyLeading: Navigator.of(context).canPop(),
           ),
           body: SafeArea(
             child: Padding(
@@ -242,6 +244,7 @@ class _AssessmentHubScreenState extends State<AssessmentHubScreen> {
               ),
             ),
           ),
+        ),
         );
       },
     );

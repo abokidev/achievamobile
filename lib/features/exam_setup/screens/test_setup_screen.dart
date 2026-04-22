@@ -198,7 +198,7 @@ class _TestSetupScreenState extends State<TestSetupScreen> {
                 onPressed: () {
                   _cameraController?.dispose();
                   _cameraController = null;
-                  Navigator.pushReplacementNamed(context, '/exam');
+                  Navigator.pushNamedAndRemoveUntil(context, '/exam', (route) => false);
                 },
               ),
             ],

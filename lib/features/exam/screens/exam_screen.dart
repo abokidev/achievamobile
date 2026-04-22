@@ -294,7 +294,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                   ),
                   onTap: () {
                     Navigator.pop(context);
-                    Navigator.pushReplacementNamed(context, '/assessment-hub');
+                    Navigator.pushNamed(context, '/assessment-hub');
                   },
                 ),
                 const SizedBox(height: 12),
@@ -358,7 +358,13 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Consumer<ExamProvider>(
       builder: (context, exam, _) {
-        return LoadingOverlay(
+        return PopScope(
+          canPop: false,
+          onPopInvoked: (didPop) {
+            if (didPop) return;
+            _showExitConfirmation();
+          },
+          child: LoadingOverlay(
           isLoading: exam.isLoading,
           message: 'Loading exam...',
           child: Scaffold(
@@ -520,6 +526,41 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
               ],
             ),
           ),
+        ),
+        );
+      },
+    );
+  }
+
+  void _showExitConfirmation() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.surface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Leave Exam?', style: TextStyle(color: AppColors.textPrimary)),
+          content: const Text(
+            'Your progress is saved. You can return to this assessment from the Assessments screen.',
+            style: TextStyle(color: AppColors.textSecondary, height: 1.5),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Stay', style: TextStyle(color: AppColors.textMuted)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/assessment-hub');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              ),
+              child: const Text('Go to Assessments'),
+            ),
+          ],
         );
       },
     );

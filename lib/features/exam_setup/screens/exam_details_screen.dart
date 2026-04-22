@@ -236,7 +236,7 @@ class _ExamDetailsScreenState extends State<ExamDetailsScreen> {
                             _selectedAssessment!['id'] as String,
                           );
                         }
-                        Navigator.pushReplacementNamed(context, '/test-setup');
+                        Navigator.pushNamed(context, '/test-setup');
                       },
                     ),
                   ],

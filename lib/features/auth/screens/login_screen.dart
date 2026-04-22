@@ -77,9 +77,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
     if (success) {
       if (authProvider.isVerified) {
-        Navigator.pushReplacementNamed(context, '/exam-details');
+        Navigator.pushNamed(context, '/exam-details');
       } else {
-        Navigator.pushReplacementNamed(context, '/nin-verification');
+        Navigator.pushNamed(context, '/nin-verification');
       }
     } else {
       _shakeController.forward();
