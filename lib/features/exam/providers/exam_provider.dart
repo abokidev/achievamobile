@@ -8,6 +8,9 @@ class ExamProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
+  // Assessment selection
+  String? _selectedAssessmentId;
+
   // Exam info
   String _examTitle = '';
   int _durationMinutes = 45;
@@ -32,6 +35,7 @@ class ExamProvider extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
   String? get error => _error;
+  String? get selectedAssessmentId => _selectedAssessmentId;
   String get examTitle => _examTitle;
   int get durationMinutes => _durationMinutes;
   int get totalQuestions => _totalQuestions;
@@ -47,6 +51,11 @@ class ExamProvider extends ChangeNotifier {
 
   Map<String, dynamic>? get currentQuestion =>
       _questions.isNotEmpty ? _questions[_currentQuestionIndex] : null;
+
+  void selectAssessment(String assessmentId) {
+    _selectedAssessmentId = assessmentId;
+    notifyListeners();
+  }
 
   bool get isCurrentQuestionEssay {
     final q = currentQuestion;
@@ -72,8 +81,8 @@ class ExamProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final infoFuture = _apiService.getExamInfo(token);
-      final questionsFuture = _apiService.getExamQuestions(token);
+      final infoFuture = _apiService.getExamInfo(token, assessmentId: _selectedAssessmentId);
+      final questionsFuture = _apiService.getExamQuestions(token, assessmentId: _selectedAssessmentId);
 
       final results = await Future.wait([infoFuture, questionsFuture]);
 

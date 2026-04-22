@@ -53,10 +53,15 @@ class _NinVerificationScreenState extends State<NinVerificationScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.dark(
-              primary: AppColors.accent,
+              primary: AppColors.primary,
               onPrimary: AppColors.textPrimary,
-              surface: AppColors.primaryLight,
+              surface: AppColors.surface,
               onSurface: AppColors.textPrimary,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.textPrimary,
+              ),
             ),
           ),
           child: child!,

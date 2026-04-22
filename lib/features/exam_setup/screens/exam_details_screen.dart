@@ -3,10 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_protector/screen_protector.dart';
 import '../../../core/constants/colors.dart';
-import '../../../core/constants/strings.dart';
 import '../../../core/services/api_service.dart';
 import '../../../shared/widgets/achieva_button.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../exam/providers/exam_provider.dart';
 
 class ExamDetailsScreen extends StatefulWidget {
   const ExamDetailsScreen({super.key});
@@ -16,14 +16,15 @@ class ExamDetailsScreen extends StatefulWidget {
 }
 
 class _ExamDetailsScreenState extends State<ExamDetailsScreen> {
-  Map<String, dynamic>? _examInfo;
+  List<Map<String, dynamic>> _assessments = [];
+  Map<String, dynamic>? _selectedAssessment;
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _enableScreenSecurity();
-    _loadExamInfo();
+    _loadAssessments();
   }
 
   Future<void> _enableScreenSecurity() async {
@@ -32,14 +33,15 @@ class _ExamDetailsScreenState extends State<ExamDetailsScreen> {
     } catch (_) {}
   }
 
-  Future<void> _loadExamInfo() async {
+  Future<void> _loadAssessments() async {
     final token = context.read<AuthProvider>().token;
     if (token == null) return;
     try {
-      final info = await ApiService().getExamInfo(token);
+      final assessments = await ApiService().getAvailableAssessments(token);
       if (mounted) {
         setState(() {
-          _examInfo = info;
+          _assessments = assessments;
+          _selectedAssessment = assessments.isNotEmpty ? assessments.first : null;
           _isLoading = false;
         });
       }
@@ -68,12 +70,55 @@ class _ExamDetailsScreenState extends State<ExamDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Assessment selector
+                    if (_assessments.length > 1) ...[
+                      const Text(
+                        'SELECT ASSESSMENT',
+                        style: TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedAssessment?['id'],
+                            isExpanded: true,
+                            dropdownColor: AppColors.surface,
+                            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textSecondary),
+                            style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
+                            items: _assessments.map((a) {
+                              return DropdownMenuItem<String>(
+                                value: a['id'] as String,
+                                child: Text(a['title'] as String),
+                              );
+                            }).toList(),
+                            onChanged: (id) {
+                              setState(() {
+                                _selectedAssessment = _assessments.firstWhere((a) => a['id'] == id);
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
                     // Exam title
                     Center(
                       child: Text(
-                        _examInfo?['title'] ?? 'General Assessment',
+                        _selectedAssessment?['title'] ?? 'Assessment',
                         style: GoogleFonts.cinzel(
-                          fontSize: 24,
+                          fontSize: 22,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textPrimary,
                         ),
@@ -94,7 +139,7 @@ class _ExamDetailsScreenState extends State<ExamDetailsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Candidate Information',
+                            'CANDIDATE INFORMATION',
                             style: TextStyle(
                               color: AppColors.textMuted,
                               fontSize: 13,
@@ -125,7 +170,7 @@ class _ExamDetailsScreenState extends State<ExamDetailsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Exam Information',
+                            'EXAM INFORMATION',
                             style: TextStyle(
                               color: AppColors.textMuted,
                               fontSize: 13,
@@ -135,13 +180,10 @@ class _ExamDetailsScreenState extends State<ExamDetailsScreen> {
                           ),
                           const SizedBox(height: 16),
                           _infoRow(Icons.timer_outlined, 'Duration',
-                              '${_examInfo?['duration_minutes'] ?? 45} minutes'),
+                              '${_selectedAssessment?['duration_minutes'] ?? 45} minutes'),
                           const SizedBox(height: 12),
-                          _infoRow(Icons.quiz_outlined, 'Total Questions',
-                              '${_examInfo?['total_questions'] ?? 40} questions'),
-                          const SizedBox(height: 12),
-                          _infoRow(Icons.category_outlined, 'Question Types',
-                              'MCQ & Essay'),
+                          _infoRow(Icons.category_outlined, 'Type',
+                              _selectedAssessment?['type'] == 'essay' ? 'Essay' : 'Multiple Choice (MCQ)'),
                         ],
                       ),
                     ),
@@ -158,12 +200,12 @@ class _ExamDetailsScreenState extends State<ExamDetailsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
+                          const Row(
                             children: [
                               Icon(Icons.warning_amber_rounded,
                                   color: AppColors.primary, size: 20),
-                              const SizedBox(width: 8),
-                              const Text(
+                              SizedBox(width: 8),
+                              Text(
                                 'Important Rules',
                                 style: TextStyle(
                                   color: AppColors.primary,
@@ -187,6 +229,11 @@ class _ExamDetailsScreenState extends State<ExamDetailsScreen> {
                       label: 'Proceed to Test Setup',
                       backgroundColor: AppColors.primary,
                       onPressed: () {
+                        if (_selectedAssessment != null) {
+                          context.read<ExamProvider>().selectAssessment(
+                            _selectedAssessment!['id'] as String,
+                          );
+                        }
                         Navigator.pushReplacementNamed(context, '/test-setup');
                       },
                     ),

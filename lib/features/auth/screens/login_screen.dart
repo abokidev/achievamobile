@@ -139,15 +139,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             letterSpacing: 6,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          AppStrings.tagline,
-                          style: GoogleFonts.dmSans(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
                         const SizedBox(height: 60),
                         AchievaTextField(
                           label: AppStrings.email,
